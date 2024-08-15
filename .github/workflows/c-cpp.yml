@@ -1,0 +1,31 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches:
+    - master
+    - releases/*
+
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  ubuntu-2404:
+    name: Ubuntu 24.04
+    runs-on: ubuntu-24.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Remove mono runtime
+      run: sudo apt-get purge mono-runtime
+
+    - name: Install dependencies
+      run: >-
+           sudo apt-get update && sudo apt-get install -y --no-install-recommends
+           wine gcc-mingw-w64-x86-64 mingw-w64-x86-64-dev
+
+    - name: Run tests
+      run: >-
+           x86_64-w64-mingw32-gcc 57035.c -Wall -Wextra -O2 -lntdll && wine ./a.exe
